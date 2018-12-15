@@ -2,15 +2,18 @@ package com.example.luong.location;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputEditText;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.luong.location.common.HttpUtils;
 import com.example.luong.location.models.ReturnObj;
@@ -46,6 +49,9 @@ public class LoginActivity extends Activity {
             @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View v) {
+                //show loading
+                layoutScroll.setVisibility(View.GONE);
+                prsLogin.setVisibility(View.VISIBLE);
                 new AsyncTask() {
                     @Override
                     protected Object doInBackground(Object[] objects) {
@@ -53,16 +59,27 @@ public class LoginActivity extends Activity {
                         String val = httpUtils.get("Register");
                         ReturnObj<User> rs = new Gson().fromJson(val,new TypeToken<ReturnObj<User>>(){}.getType());
                         return rs;
-
-
                     }
-
                     @Override
                     protected void onPostExecute(Object o) {
                         txtRs.setText(o.toString());
                         ReturnObj<User> u = (ReturnObj<User>) o;
-                        txtUser.setText(u.Data.UserName);
-                        txtPass.setText(u.Data.Password);
+                        String user = txtUser.getText().toString().trim();
+                        String pass = txtPass.getText().toString().trim();
+                        //
+                        String userC = u.Data.UserName.toString().trim();
+                        String passC = u.Data.Password.toString().trim();
+                        if( userC.equals(user) && passC.equals(pass)){
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            layoutScroll.setVisibility(View.VISIBLE);
+                            prsLogin.setVisibility(View.GONE);
+                            finish();
+                        }else{
+                            //Hide Loading
+                            layoutScroll.setVisibility(View.VISIBLE);
+                            prsLogin.setVisibility(View.GONE);
+                            Toast.makeText(LoginActivity.this, "Đăng nhập thất bại",Toast.LENGTH_LONG).show();
+                        }
                     }
                 }.execute();
         }
