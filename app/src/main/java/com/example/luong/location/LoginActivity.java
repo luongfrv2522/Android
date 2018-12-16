@@ -33,6 +33,10 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
+        /*****a*****/
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        finish();
+        /*****a*****/
         innitControl();
         excuteControl();
     }
@@ -67,8 +71,9 @@ public class LoginActivity extends Activity {
                         String user = txtUser.getText().toString().trim();
                         String pass = txtPass.getText().toString().trim();
                         //
-                        String userC = u.Data.UserName.toString().trim();
-                        String passC = u.Data.Password.toString().trim();
+                        String userC = u.Data.UserName.trim();
+                        String passC = u.Data.Password.trim();
+
                         if( userC.equals(user) && passC.equals(pass)){
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             layoutScroll.setVisibility(View.VISIBLE);
