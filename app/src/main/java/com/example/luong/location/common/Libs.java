@@ -1,5 +1,7 @@
 package com.example.luong.location.common;
 
-public class Libs {
+import android.content.Context;
+import android.content.SharedPreferences;
 
+public class Libs {
 }

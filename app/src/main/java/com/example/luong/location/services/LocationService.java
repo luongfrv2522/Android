@@ -1,9 +1,7 @@
 package com.example.luong.location.services;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -14,7 +12,12 @@ import android.widget.Toast;
 
 import java.util.Date;
 
+import microsoft.aspnet.signalr.client.hubs.HubConnection;
+import microsoft.aspnet.signalr.client.hubs.HubProxy;
+
 public class LocationService extends Service {
+    private HubConnection hubConnection;
+    private HubProxy hubProxy;
     Handler handler;
     @Nullable
     @Override
@@ -27,6 +30,7 @@ public class LocationService extends Service {
     public void onCreate() {
         Toast.makeText(this, "onCreate_Service", Toast.LENGTH_SHORT).show();
         //onStartCommand(null,START_STICKY,0);
+
     }
 
     @Override
@@ -50,7 +54,6 @@ public class LocationService extends Service {
             handler.removeCallbacksAndMessages(null);
         }
         Toast.makeText(this, "onDestroy_Service", Toast.LENGTH_SHORT).show();
-        super.onDestroy();
     }
 
 }

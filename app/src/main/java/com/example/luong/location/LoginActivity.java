@@ -2,6 +2,7 @@ package com.example.luong.location;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,11 +16,19 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.luong.location.DataStorage.ErrorCodes;
+import com.example.luong.location.DataStorage.UserConnected;
 import com.example.luong.location.common.HttpUtils;
+import com.example.luong.location.common.StaticClass;
 import com.example.luong.location.models.ReturnObj;
 import com.example.luong.location.models.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Objects;
 
 
 public class LoginActivity extends Activity {
@@ -33,12 +42,12 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
-        /*****a*****/
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-        finish();
-        /*****a*****/
+        checkIsLogin();//nếu đã đăng nhập thì chuyển màn
         innitControl();
         excuteControl();
+    }
+    private void checkIsLogin(){
+
     }
     private void innitControl(){
         btnLogin = findViewById(R.id.btn_login);
@@ -54,40 +63,62 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //show loading
-                layoutScroll.setVisibility(View.GONE);
-                prsLogin.setVisibility(View.VISIBLE);
+                showLoading(true);
+                final String user = Objects.requireNonNull(txtUser.getText()).toString().trim();
+                final String pass = Objects.requireNonNull(txtPass.getText()).toString().trim();
                 new AsyncTask() {
                     @Override
                     protected Object doInBackground(Object[] objects) {
                         HttpUtils httpUtils = new HttpUtils();
-                        String val = httpUtils.get("Register");
-                        ReturnObj<User> rs = new Gson().fromJson(val,new TypeToken<ReturnObj<User>>(){}.getType());
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("UserName", user);
+                            jsonObject.put("Password", pass);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        String val = httpUtils.post("Account/Login",jsonObject.toString());
+                        ReturnObj<User> rs = null;
+                        if(Objects.nonNull(val)){
+                             rs = new Gson().fromJson(val,new TypeToken<ReturnObj<User>>(){}.getType());
+                        }
                         return rs;
                     }
                     @Override
                     protected void onPostExecute(Object o) {
                         txtRs.setText(o.toString());
-                        ReturnObj<User> u = (ReturnObj<User>) o;
-                        String user = txtUser.getText().toString().trim();
-                        String pass = txtPass.getText().toString().trim();
-                        //
-                        String userC = u.Data.UserName.trim();
-                        String passC = u.Data.Password.trim();
+                        if(Objects.nonNull(o)){
+                            ReturnObj<User> u = (ReturnObj<User>) o;
+                            //
+                            if(u.hasData() && u.ErrorCode.equals(ErrorCodes.SUCCESS)){
+                                String userC = u.Data.getUserName();
+                                String passC = u.Data.getPassword();
+                                if(user.equals(userC) && pass.equals(passC)){
+                                    startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                    showLoading(false);
+                                    finish();
+                                }
+                            }else{
+                                showLoading(false);
+                                Log.e("onPostExecute",u.ErrorCode + " - " + u.Message);
+                            }
 
-                        if( userC.equals(user) && passC.equals(pass)){
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            layoutScroll.setVisibility(View.VISIBLE);
-                            prsLogin.setVisibility(View.GONE);
-                            finish();
-                        }else{
-                            //Hide Loading
-                            layoutScroll.setVisibility(View.VISIBLE);
-                            prsLogin.setVisibility(View.GONE);
-                            Toast.makeText(LoginActivity.this, "Đăng nhập thất bại",Toast.LENGTH_LONG).show();
+                        }else {
+                            Toast.makeText(LoginActivity.this, "Lỗi Api",Toast.LENGTH_LONG).show();
                         }
+
                     }
                 }.execute();
         }
         });
+    }
+    private void showLoading(Boolean show){
+        if(show){
+            layoutScroll.setVisibility(View.GONE);
+            prsLogin.setVisibility(View.VISIBLE);
+        }else {
+            layoutScroll.setVisibility(View.VISIBLE);
+            prsLogin.setVisibility(View.GONE);
+        }
     }
 }

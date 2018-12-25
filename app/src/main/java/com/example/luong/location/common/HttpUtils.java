@@ -1,35 +1,79 @@
 package com.example.luong.location.common;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.squareup.okhttp.HttpUrl;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class HttpUtils {
-    private final String BASE_URI = "http://demo2100786.mockable.io/";
+    private final String BASE_URI = "http://192.168.88.105:8088/api/";
     private static OkHttpClient client = null;
     public HttpUtils(){
         if(client == null){
             client = new OkHttpClient();
         }
     }
-    public String get(String uri){
+    public String get(String uri, Map<String,String> params){
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(BASE_URI+uri).newBuilder();
+        if(params != null){
+            for(Map.Entry<String,String> param : params.entrySet()){
+                httpBuilder.addQueryParameter(param.getKey(), param.getValue());
+            }
+        }
         Request request = new Request.Builder()
                 .url(BASE_URI+uri)
                 .get()
                 .build();
-        Response response = null;
+        Response response;
         try {
             response = client.newCall(request).execute();
             return response.body().string();
         }catch (IOException e){
             e.printStackTrace();
         }
-        return null;
+        return "";
+    }
+    public String get(String uri){
+        Request request = new Request.Builder()
+                .url(BASE_URI+uri)
+                .get()
+                .build();
+        Response response;
+        try {
+            response = client.newCall(request).execute();
+            return response.body().string();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return "";
+    }
+    public String post(String uri, String json){
+        try {
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8;");
+            RequestBody requestBody = RequestBody.create(JSON, json);
+            Request request = new Request.Builder()
+                    .url(BASE_URI+uri)
+                    .post(requestBody)
+                    .build();
+            Response response;
+            response = client.newCall(request).execute();
+            return response.body().string();
+        }catch (IOException e){
+            e.printStackTrace();
+        }catch (Exception e){
+            Log.e("HttpUtils/post: ",e.getMessage());
+        }
+        return "";
     }
 }

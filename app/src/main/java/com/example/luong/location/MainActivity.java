@@ -18,7 +18,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.luong.location.common.StaticState;
 import com.example.luong.location.services.LocationService;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toast.makeText(this, "onCreate_MainMenu", Toast.LENGTH_SHORT).show();
         innitControl();
-        excuteControl();
+        eventControl();
     }
 
     private void innitControl(){
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    private void excuteControl() {
+    private void eventControl() {
         //region Mở menu active cấp quyền tự động chạy
         btnAutoRunActive.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,9 +54,8 @@ public class MainActivity extends AppCompatActivity {
         });
         //endregion
         updateShowState();
+
         // set giá trị ban đầu cho switch
-        StaticState.ServiceLocationStarted = isMyServiceRunning(LocationService.class);
-        swtService.setChecked(StaticState.ServiceLocationStarted);
         swtService.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -77,11 +75,6 @@ public class MainActivity extends AppCompatActivity {
         //Toast.makeText(this, "onResume_MainMenu", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        //Toast.makeText(this, "onPostResume_MainMenu", Toast.LENGTH_SHORT).show();
-    }
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         assert manager != null;
@@ -96,15 +89,14 @@ public class MainActivity extends AppCompatActivity {
     private void updateShowState(){
         //test
         txtCheckServiceRuning.setText("isMyServiceRunning: "+ isMyServiceRunning(LocationService.class));
-        txtStateService.setText("txtStateService: "+ StaticState.ServiceLocationStarted);
     }
     @SuppressLint("StaticFieldLeak")
     private void startServices(){
+
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
                 startService(intent);
-                StaticState.ServiceLocationStarted = true;
                 return null;
             }
 
@@ -118,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
     }
     private void stopServices(){
         stopService(intent);
-        StaticState.ServiceLocationStarted = false;
         updateShowState();
     }
     private void addAutoStartup() {

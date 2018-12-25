@@ -8,10 +8,10 @@ public class ReturnObj<T> implements Serializable{
     public String Message;
     public T Data;
     public List<T> ListData;
-    public boolean CheckHasData(){
+    public boolean hasData(){
         return Data != null;
     }
-    public boolean CheckHasListData(){
+    public boolean hasListData(){
         return ListData != null;
     }
 }
