@@ -88,7 +88,9 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void updateShowState(){
         //test
-        txtCheckServiceRuning.setText("isMyServiceRunning: "+ isMyServiceRunning(LocationService.class));
+        boolean serviceIsRuning = isMyServiceRunning(LocationService.class);
+        txtCheckServiceRuning.setText("isMyServiceRunning: "+ serviceIsRuning);
+        swtService.setChecked(serviceIsRuning);
     }
     @SuppressLint("StaticFieldLeak")
     private void startServices(){

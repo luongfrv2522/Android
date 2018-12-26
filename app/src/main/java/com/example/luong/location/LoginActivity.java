@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.util.Log;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 
 import com.example.luong.location.dataStorage.ErrorCodes;
 import com.example.luong.location.common.HttpUtils;
+import com.example.luong.location.dataStorage.UserConnected;
+import com.example.luong.location.dataStorage.UserManager;
 import com.example.luong.location.models.ReturnObj;
 import com.example.luong.location.models.User;
 import com.google.gson.Gson;
@@ -45,7 +48,10 @@ public class LoginActivity extends Activity {
         excuteControl();
     }
     private void checkIsLogin(){
-
+        User userSession = UserConnected.getUserSession(LoginActivity.this);
+        if(Objects.nonNull(userSession)){
+            new LoginAsynTask(userSession.getUserName(), userSession.getPassword()).execute();
+        }
     }
     private void innitControl(){
         btnLogin = findViewById(R.id.btn_login);
@@ -64,47 +70,10 @@ public class LoginActivity extends Activity {
                 hideKeyBoard();
                 //show loading
                 showLoading(true);
-                final String user = Objects.requireNonNull(txtUser.getText()).toString().trim();
-                final String pass = Objects.requireNonNull(txtPass.getText()).toString().trim();
-                AsyncTask asyncTask = new AsyncTask() {
-                    @Override
-                    protected Object doInBackground(Object[] objects) {
-                        HttpUtils httpUtils = new HttpUtils();
-                        JSONObject jsonObject = new JSONObject();
-                        try {
-                            jsonObject.put("UserName", user);
-                            jsonObject.put("Password", pass);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        String val = httpUtils.post("Account/Login", jsonObject.toString());
-                        ReturnObj<User> rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
-                        return rs;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Object o) {
-                        if (Objects.nonNull(o)) {
-                            ReturnObj<User> u = (ReturnObj<User>) o;
-                            //
-                            if (u.ErrorCode.equals(ErrorCodes.SUCCESS) && u.hasData()) {
-                                String userC = u.Data.getUserName();
-                                String passC = u.Data.getPassword();
-                                if (user.equals(userC) && pass.equals(passC)) {
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                    finish();
-                                }
-                            } else {
-                                Log.e("LoginActivity/onPostExecute", u.ErrorCode + " - " + u.ErrorMessage);
-                                Toast.makeText(LoginActivity.this, u.ErrorMessage, Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Lỗi Api", Toast.LENGTH_LONG).show();
-                        }
-                        showLoading(false);
-                    }
-                };
-                asyncTask.execute();
+                //Login Asyntask
+                String user = Objects.requireNonNull(txtUser.getText()).toString().trim();
+                String pass = Objects.requireNonNull(txtPass.getText()).toString().trim();
+                new LoginAsynTask(user, pass).execute();
             }
         });
     }
@@ -123,6 +92,51 @@ public class LoginActivity extends Activity {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         } catch (Exception e) {
             Log.d("LoginActivity/hideKeyBoard",e.getMessage());
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    public class LoginAsynTask extends AsyncTask<Objects, Void, Object> {
+        private String user;
+        private String pass;
+
+        public LoginAsynTask(String user, String pass) {
+            this.user = user.trim();
+            this.pass = pass.trim();
+        }
+
+        @Override
+        protected Object doInBackground(Objects... objects) {
+            HttpUtils httpUtils = new HttpUtils();
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("UserName", user);
+                jsonObject.put("Password", pass);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String val = httpUtils.post("Account/Login", jsonObject.toString());
+            ReturnObj<User> rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
+            return rs;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            if (Objects.nonNull(o)) {
+                ReturnObj<User> u = (ReturnObj<User>) o;
+                //
+                if (u.ErrorCode.equals(ErrorCodes.SUCCESS) && u.hasData()) {
+                    UserConnected.setUserSession(LoginActivity.this,u.Data);
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                } else {
+                    Log.e("LoginActivity/onPostExecute", u.ErrorCode + " - " + u.ErrorMessage);
+                    Toast.makeText(LoginActivity.this, u.ErrorMessage, Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(LoginActivity.this, "Lỗi Api", Toast.LENGTH_LONG).show();
+            }
+            showLoading(false);
         }
     }
 }

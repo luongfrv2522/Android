@@ -40,8 +40,7 @@ public class LocationService extends Service {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                String date = new Date().toString();
-                Log.d("TestService",date);
+                Log.d("TestService","Run Background");
                 handler.postDelayed(this,3000);
             }
         },3000);
@@ -53,6 +52,7 @@ public class LocationService extends Service {
         if(handler!= null){
             handler.removeCallbacksAndMessages(null);
         }
+        Log.d("TestService","Run onDestroy");
         Toast.makeText(this, "onDestroy_Service", Toast.LENGTH_SHORT).show();
     }
 
