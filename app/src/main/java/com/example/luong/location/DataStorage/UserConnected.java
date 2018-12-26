@@ -1,11 +1,10 @@
-package com.example.luong.location.DataStorage;
+package com.example.luong.location.dataStorage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.luong.location.common.StaticClass;
 import com.example.luong.location.models.User;
-import com.google.gson.Gson;
 
 public class UserConnected {
     private static String USER_SESSION = "UserSession";

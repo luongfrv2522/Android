@@ -1,4 +1,4 @@
-package com.example.luong.location.DataStorage;
+package com.example.luong.location.dataStorage;
 
 public class ErrorCodes {
     public static final String SUCCESS = "0";

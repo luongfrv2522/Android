@@ -1,4 +1,4 @@
-package com.example.luong.location.DataStorage;
+package com.example.luong.location.dataStorage;
 
 public class Manager {
     public static final String DATABASE_NAME ="location";

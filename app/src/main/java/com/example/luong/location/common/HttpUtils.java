@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class HttpUtils {
-    private final String BASE_URI = "http://192.168.88.105:8088/api/";
+    private final String BASE_URI = "http://172.27.144.41:8088/api/";
     private static OkHttpClient client = null;
     public HttpUtils(){
         if(client == null){
