@@ -47,7 +47,7 @@ public class LoginActivity extends Activity {
         excuteControl();
     }
     private void checkIsLogin(){
-
+        
     }
     private void innitControl(){
         btnLogin = findViewById(R.id.btn_login);
