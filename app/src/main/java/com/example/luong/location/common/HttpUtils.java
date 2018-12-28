@@ -1,23 +1,18 @@
 package com.example.luong.location.common;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.Map;
 
 public class HttpUtils {
-    private final String BASE_URI = "http://192.168.88.105:8088/api/";
     private static OkHttpClient client = null;
     public HttpUtils(){
         if(client == null){
@@ -25,14 +20,14 @@ public class HttpUtils {
         }
     }
     public String get(String uri, Map<String,String> params){
-        HttpUrl.Builder httpBuilder = HttpUrl.parse(BASE_URI+uri).newBuilder();
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(uri).newBuilder();
         if(params != null){
             for(Map.Entry<String,String> param : params.entrySet()){
                 httpBuilder.addQueryParameter(param.getKey(), param.getValue());
             }
         }
         Request request = new Request.Builder()
-                .url(BASE_URI+uri)
+                .url(uri)
                 .get()
                 .build();
         Response response;
@@ -46,7 +41,7 @@ public class HttpUtils {
     }
     public String get(String uri){
         Request request = new Request.Builder()
-                .url(BASE_URI+uri)
+                .url(uri)
                 .get()
                 .build();
         Response response;
@@ -63,7 +58,7 @@ public class HttpUtils {
             MediaType JSON = MediaType.parse("application/json; charset=utf-8;");
             RequestBody requestBody = RequestBody.create(JSON, json);
             Request request = new Request.Builder()
-                    .url(BASE_URI+uri)
+                    .url(uri)
                     .post(requestBody)
                     .build();
             Response response;

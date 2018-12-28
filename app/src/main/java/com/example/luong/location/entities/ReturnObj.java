@@ -1,11 +1,11 @@
-package com.example.luong.location.models;
+package com.example.luong.location.entities;
 
 import java.io.Serializable;
 import java.util.List;
 
 public class ReturnObj<T> implements Serializable{
     public String ErrorCode = "0";
-    public String Message;
+    public String ErrorMessage;
     public T Data;
     public List<T> ListData;
     public boolean hasData(){
