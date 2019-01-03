@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.luong.location.common.ErrorCodes;
 import com.example.luong.location.common.GlobalConfig;
 import com.example.luong.location.common.HttpUtils;
+import com.example.luong.location.common.Libs;
 import com.example.luong.location.dataStorage.UserConnected;
 import com.example.luong.location.entities.ReturnObj;
 import com.example.luong.location.entities.User;
@@ -121,7 +122,10 @@ public class LoginActivity extends Activity {
                 e.printStackTrace();
             }
             String val = httpUtils.post(GlobalConfig.ServerString.BASE_API_URL+"Account/Login", jsonObject.toString());
-            ReturnObj<User> rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
+            ReturnObj<User> rs = null;
+            if(Libs.isJSONValid(val)){
+                rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
+            }
             return rs;
         }
 

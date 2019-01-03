@@ -51,7 +51,8 @@
             android:id="@+id/swt_service"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/run_service" />
+            android:text="@string/run_service"
+            android:clickable="false"/>
 
         <TextView
             android:id="@+id/txtCheckServiceRuning"

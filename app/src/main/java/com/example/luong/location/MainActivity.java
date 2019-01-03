@@ -13,6 +13,7 @@ import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -57,9 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void eventControl() {
+        updateShowState();
+        intentService = new Intent(MainActivity.this, LocationService.class);
+
+        //#region Set sự kiện cho logout button
         //region Xin cấp quyền truy cập vị trí
-        runTimePermission();
+        if(!runTimePermission()){
+            enableSwitch();
+        }
+        //#endregion
         //endregion
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         //region Mở menu active cấp quyền tự động chạy
         btnAutoRunActive.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,37 +81,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //endregion
-        updateShowState();
-        intentService = new Intent(MainActivity.this, LocationService.class);
-        // set giá trị ban đầu cho switch
-        swtService.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    startServices();
-                }else{
-                    stopServices();
-                }
-            }
-        });
-        //#region Set sự kiện cho logout button
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Đóng service
-                stopServices();
-                //Xóa dữ liệu đăng nhập
-                UserConnected.removeUserSession(MainActivity.this);
-                Intent intentToLogin = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intentToLogin);
-            }
-        });
-        //#endregion
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         if(broadcastReceiver == null){
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
@@ -120,8 +102,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 100 && (grantResults[0] != PackageManager.PERMISSION_GRANTED || grantResults[1] != PackageManager.PERMISSION_GRANTED)){
-            runTimePermission();
+        if(requestCode == 100){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                enableSwitch();
+            }else{
+                runTimePermission();
+            }
+
         }
     }
 
@@ -141,6 +128,31 @@ public class MainActivity extends AppCompatActivity {
         boolean serviceIsRuning = isMyServiceRunning(LocationService.class);
         txtCheckServiceRuning.setText("isMyServiceRunning: "+ serviceIsRuning);
         swtService.setChecked(serviceIsRuning);
+    }
+    private void enableSwitch(){
+        swtService.setClickable(true);
+        // set giá trị ban đầu cho switch
+        swtService.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    startServices();
+                }else{
+                    stopServices();
+                }
+            }
+        });
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Đóng service
+                stopServices();
+                //Xóa dữ liệu đăng nhập
+                UserConnected.removeUserSession(MainActivity.this);
+                Intent intentToLogin = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intentToLogin);
+            }
+        });
     }
     @SuppressLint("StaticFieldLeak")
     private void startServices(){
@@ -189,9 +201,9 @@ public class MainActivity extends AppCompatActivity {
             Log.e("exc" , String.valueOf(e));
         }
     }
-    private boolean runTimePermission(){
-        if(Build.VERSION.SDK_INT >=23 && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)){
+    public boolean runTimePermission(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},100);
             return true;
         }
