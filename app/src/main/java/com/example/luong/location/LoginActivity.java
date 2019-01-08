@@ -47,14 +47,18 @@ public class LoginActivity extends Activity {
         innitControl();
         checkIsLogin();//nếu đã đăng nhập thì chuyển màn
         excuteControl();
+
     }
     private void checkIsLogin(){
-        //showLoading(true);
+        showLoading(true);
         User userSession = UserConnected.getUserSession(LoginActivity.this);
         if(Objects.nonNull(userSession)){
+            txtUser.setText(userSession.getUserName());
+            txtPass.setText(userSession.getPassword());
             new LoginAsynTask(userSession.getUserName(), userSession.getPassword()).execute();
+        }else {
+            showLoading(false);
         }
-        //showLoading(false);
     }
     private void innitControl(){
         btnLogin = findViewById(R.id.btn_login);

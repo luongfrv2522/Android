@@ -60,7 +60,7 @@ public class LocationService extends Service{
     public void onCreate() {
         Toast.makeText(this, "onCreate_Service", Toast.LENGTH_SHORT).show();
         Log.d("signalr", "In startSignalR()");
-        //startSignalR();
+        startSignalR();
         Log.d("signalr", "Out startSignalR()");
     }
 
@@ -68,7 +68,7 @@ public class LocationService extends Service{
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "onStartCommand_Service", Toast.LENGTH_SHORT).show();
         //region listener
-        listener = new MyLocationListener(LocationManager.NETWORK_PROVIDER);
+        listener = new MyLocationListener();
         Log.d("signalr", "locationListener Done");
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -81,7 +81,8 @@ public class LocationService extends Service{
         }
         if(locationManager != null){
             Log.d("signalr", "locationManager Not null");
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0, listener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, listener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, listener);
         }
         //endregion
         return START_STICKY;
@@ -104,12 +105,6 @@ public class LocationService extends Service{
             @Override
             public void run() {
                 Log.d("signalr","hubConnection connected!");
-            }
-        });
-        hubConnection.setCredentials(new Credentials() {
-            @Override
-            public void prepareRequest(Request request) {
-
             }
         });
         hubProxy = hubConnection.createHubProxy(GlobalConfig.ServerString.CHAT_HUB_NAME);
@@ -136,16 +131,9 @@ public class LocationService extends Service{
         Log.d("signalr","End startSignalR()");
     }
     public class MyLocationListener implements LocationListener{
-        Location mLastLocation;
 
-        MyLocationListener(String provider)
-        {
-            Log.e("signalr", "LocationListener " + provider);
-            mLastLocation = new Location(provider);
-        }
         @Override
         public void onLocationChanged(Location location) {
-            mLastLocation.set(location);
             //
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("Lat", location.getLatitude());
@@ -156,7 +144,7 @@ public class LocationService extends Service{
             sendBroadcast(i);
             //
             Log.d("signalr", UserConnected.getUserSession(LocationService.this).getUserId() + ":" + jsonObject.toString());
-            //hubProxy.invoke("Send", UserConnected.getUserSession(LocationService.this).getUserId(), jsonObject.toString());
+            hubProxy.invoke("Send", UserConnected.getUserSession(LocationService.this).getUserId(), jsonObject.toString());
         }
 
         @Override
