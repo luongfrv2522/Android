@@ -55,10 +55,11 @@ public class HttpUtils {
     }
     public String post(String uri, String json){
         try {
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8;");
+            MediaType JSON = MediaType.parse("application/json");
             RequestBody requestBody = RequestBody.create(JSON, json);
             Request request = new Request.Builder()
                     .url(uri)
+                    .addHeader("content-type","application/json")
                     .post(requestBody)
                     .build();
             Response response;
