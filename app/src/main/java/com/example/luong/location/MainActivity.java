@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.example.luong.location.dataStorage.UserConnected;
 import com.example.luong.location.services.LocationService;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     Switch swtService;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txtCheckServiceRuning
             ,txtStateService;
     BroadcastReceiver broadcastReceiver;
+    BroadcastReceiver broadcastReceiver2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +91,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
             registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
+        }
+        if(broadcastReceiver2 == null){
+            broadcastReceiver2 = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    boolean status = Objects.requireNonNull(intent.getExtras()).getBoolean("status");
+                    if(status){
+                        swtService.setChecked(false);
+                    }
+                }
+            };
+            registerReceiver(broadcastReceiver, new IntentFilter("off_switch"));
         }
         //Toast.makeText(this, "onResume_MainMenu", Toast.LENGTH_SHORT).show();
     }

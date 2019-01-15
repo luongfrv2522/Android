@@ -23,8 +23,10 @@ import android.widget.Toast;
 
 import com.example.luong.location.common.GlobalConfig;
 import com.example.luong.location.dataStorage.UserConnected;
+import com.example.luong.location.models.LogHub;
 import com.google.gson.JsonObject;
 
+import java.net.ConnectException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
@@ -43,8 +45,7 @@ import microsoft.aspnet.signalr.client.transport.ServerSentEventsTransport;
 import static android.support.v4.app.ActivityCompat.requestPermissions;
 
 public class LocationService extends Service{
-    private HubConnection hubConnection;
-    private HubProxy hubProxy;
+    private LogHub logHub;
     private Handler handlerHub;
     private Handler handler;
 
@@ -55,17 +56,44 @@ public class LocationService extends Service{
     public IBinder onBind(Intent intent) {
         return null;
     }
-
     @Override
     public void onCreate() {
         Toast.makeText(this, "onCreate_Service", Toast.LENGTH_SHORT).show();
         Log.d("signalr", "In startSignalR()");
-        startSignalR();
-        Log.d("signalr", "Out startSignalR()");
+        //startSignalR();
+        logHub = new LogHub();
+        logHub.startHub();
+        logHub.addOn2("addNewMessageToPage", new SubscriptionHandler2<String, String>() {
+            @Override
+            public void run(String s, String s2) {
+                Log.d("signalr",s +" - "+ s2);
+            }
+        });
+        logHub.addInvoke("send", "Luongk","signalr: Invoike truc tiep");
     }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        handlerHub = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if(logHub.isStarted()){
+                    boolean flagA = logHub.addInvoke("Send", "luongk","signalr: Invoike truc tiep");
+                    Log.d("signalr", "addInvoke: " + flagA);
+                }
+                else{
+                    if(logHub.startHub()){
+                        logHub.addInvoke("Send", "luongk","signalr: Invoike sau khi khoi dong lai Hub");
+                        Log.d("signalr", "signalr: Invoike sau khi khoi dong lai Hub");
+                    }else {
+                        Log.e("signalr", "Khong khoi dong lai duocj");
+                    }
+                }
+                Log.e("signalr", "Runable");
+                handlerHub.postDelayed(this,3000);
+            }
+        };
+        handlerHub.post(runnable);
         Toast.makeText(this, "onStartCommand_Service", Toast.LENGTH_SHORT).show();
         //region listener
         listener = new MyLocationListener();
@@ -87,48 +115,14 @@ public class LocationService extends Service{
         //endregion
         return START_STICKY;
     }
-
     @Override
     public void onDestroy() {
         if(handler!= null) handler.removeCallbacksAndMessages(null);
         if(handlerHub!= null) handlerHub.removeCallbacksAndMessages(null);
-        if(hubConnection != null) hubConnection.disconnect();
+        if(logHub.isStarted()) logHub.disconnectHub();
         if(locationManager != null) locationManager.removeUpdates(listener);
         Log.d("TestService","Run onDestroy");
         Toast.makeText(this, "onDestroy_Service", Toast.LENGTH_SHORT).show();
-    }
-
-    protected void startSignalR(){
-        Platform.loadPlatformComponent(new AndroidPlatformComponent());
-        hubConnection = new HubConnection(GlobalConfig.ServerString.BASE_HUB_URL);
-        hubConnection.connected(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("signalr","hubConnection connected!");
-            }
-        });
-        hubProxy = hubConnection.createHubProxy(GlobalConfig.ServerString.CHAT_HUB_NAME);
-        Log.e("signalr","Begin startSignalR()");
-        ClientTransport clientTransport = new ServerSentEventsTransport(hubConnection.getLogger());
-        SignalRFuture<Void> signalRFuture = hubConnection.start(clientTransport);
-
-        try {
-            signalRFuture.get();
-        }catch (InterruptedException | ExecutionException e){
-            Log.e("signalr",e.getMessage());
-            return;
-        }
-        Log.d("signalr","Mid startSignalR()");
-        //#region On messages
-        hubProxy.on("setLocation", new SubscriptionHandler2<String, String>() {
-            @Override
-            public void run(String s, String s2) {
-                Log.d("signalr",s+" : "+s2);
-            }
-        },String.class,String.class);
-        //hubProxy.invoke("Send", "android","Oke");
-        //#endregion
-        Log.d("signalr","End startSignalR()");
     }
     public class MyLocationListener implements LocationListener{
 
@@ -144,7 +138,8 @@ public class LocationService extends Service{
             sendBroadcast(i);
             //
             Log.d("signalr", UserConnected.getUserSession(LocationService.this).getUserId() + ":" + jsonObject.toString());
-            hubProxy.invoke("Send", UserConnected.getUserSession(LocationService.this).getUserId(), jsonObject.toString());
+            //hubProxy.invoke("Send", UserConnected.getUserSession(LocationService.this).getUserId(), jsonObject.toString());
+
         }
 
         @Override

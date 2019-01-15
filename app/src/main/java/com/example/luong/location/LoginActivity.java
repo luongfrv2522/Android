@@ -44,21 +44,22 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
-        innitControl();
+        /*innitControl();
         checkIsLogin();//nếu đã đăng nhập thì chuyển màn
-        excuteControl();
-
+        excuteControl();*/
+        //
+        startActivity(new Intent(LoginActivity.this, TestSignalrActivity.class));
+        finish();
+        //
     }
     private void checkIsLogin(){
         showLoading(true);
         User userSession = UserConnected.getUserSession(LoginActivity.this);
         if(Objects.nonNull(userSession)){
-            txtUser.setText(userSession.getUserName());
-            txtPass.setText(userSession.getPassword());
-            new LoginAsynTask(userSession.getUserName(), userSession.getPassword()).execute();
-        }else {
-            showLoading(false);
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
         }
+        showLoading(false);
     }
     private void innitControl(){
         btnLogin = findViewById(R.id.btn_login);
