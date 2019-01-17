@@ -2,25 +2,36 @@ package com.example.luong.location;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+<<<<<<< HEAD
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+=======
+import android.os.Handler;
+>>>>>>> parent of e02d819... signal simple
 import android.support.design.widget.TextInputEditText;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+<<<<<<< HEAD
 import com.example.luong.location.dataStorage.ErrorCodes;
 import com.example.luong.location.common.HttpUtils;
 import com.example.luong.location.dataStorage.UserConnected;
 import com.example.luong.location.dataStorage.UserManager;
+=======
+import com.example.luong.location.DataStorage.ErrorCodes;
+import com.example.luong.location.DataStorage.UserConnected;
+import com.example.luong.location.common.HttpUtils;
+import com.example.luong.location.common.StaticClass;
+>>>>>>> parent of e02d819... signal simple
 import com.example.luong.location.models.ReturnObj;
 import com.example.luong.location.models.User;
 import com.google.gson.Gson;
@@ -48,10 +59,14 @@ public class LoginActivity extends Activity {
         excuteControl();
     }
     private void checkIsLogin(){
+<<<<<<< HEAD
         User userSession = UserConnected.getUserSession(LoginActivity.this);
         if(Objects.nonNull(userSession)){
             new LoginAsynTask(userSession.getUserName(), userSession.getPassword()).execute();
         }
+=======
+        
+>>>>>>> parent of e02d819... signal simple
     }
     private void innitControl(){
         btnLogin = findViewById(R.id.btn_login);
@@ -66,15 +81,62 @@ public class LoginActivity extends Activity {
             @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View v) {
-                //Ẩn bàn phím
-                hideKeyBoard();
                 //show loading
                 showLoading(true);
+<<<<<<< HEAD
                 //Login Asyntask
                 String user = Objects.requireNonNull(txtUser.getText()).toString().trim();
                 String pass = Objects.requireNonNull(txtPass.getText()).toString().trim();
                 new LoginAsynTask(user, pass).execute();
             }
+=======
+                final String user = Objects.requireNonNull(txtUser.getText()).toString().trim();
+                final String pass = Objects.requireNonNull(txtPass.getText()).toString().trim();
+                new AsyncTask() {
+                    @Override
+                    protected Object doInBackground(Object[] objects) {
+                        HttpUtils httpUtils = new HttpUtils();
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("UserName", user);
+                            jsonObject.put("Password", pass);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        String val = httpUtils.post("Account/Login",jsonObject.toString());
+                        ReturnObj<User> rs = null;
+                        if(Objects.nonNull(val)){
+                             rs = new Gson().fromJson(val,new TypeToken<ReturnObj<User>>(){}.getType());
+                        }
+                        return rs;
+                    }
+                    @Override
+                    protected void onPostExecute(Object o) {
+                        txtRs.setText(o.toString());
+                        if(Objects.nonNull(o)){
+                            ReturnObj<User> u = (ReturnObj<User>) o;
+                            //
+                            if(u.hasData() && u.ErrorCode.equals(ErrorCodes.SUCCESS)){
+                                String userC = u.Data.getUserName();
+                                String passC = u.Data.getPassword();
+                                if(user.equals(userC) && pass.equals(passC)){
+                                    startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                    showLoading(false);
+                                    finish();
+                                }
+                            }else{
+                                showLoading(false);
+                                Log.e("onPostExecute",u.ErrorCode + " - " + u.Message);
+                            }
+
+                        }else {
+                            Toast.makeText(LoginActivity.this, "Lỗi Api",Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                }.execute();
+        }
+>>>>>>> parent of e02d819... signal simple
         });
     }
     private void showLoading(Boolean show){
@@ -86,6 +148,7 @@ public class LoginActivity extends Activity {
             prsLogin.setVisibility(View.GONE);
         }
     }
+<<<<<<< HEAD
     private void hideKeyBoard(){
         try {
             InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
@@ -139,4 +202,6 @@ public class LoginActivity extends Activity {
             showLoading(false);
         }
     }
+=======
+>>>>>>> parent of e02d819... signal simple
 }
