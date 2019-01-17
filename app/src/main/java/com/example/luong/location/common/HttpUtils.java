@@ -17,11 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class HttpUtils {
-<<<<<<< HEAD
     private final String BASE_URI = "http://100.64.188.115:8088/api/";
-=======
-    private final String BASE_URI = "http://192.168.88.105:8088/api/";
->>>>>>> parent of e02d819... signal simple
     private static OkHttpClient client = null;
     public HttpUtils(){
         if(client == null){

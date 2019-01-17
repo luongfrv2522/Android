@@ -40,12 +40,7 @@ public class LocationService extends Service {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-<<<<<<< HEAD
                 Log.d("TestService","Run Background");
-=======
-                String date = new Date().toString();
-                Log.d("TestService",date);
->>>>>>> parent of e02d819... signal simple
                 handler.postDelayed(this,3000);
             }
         },3000);
@@ -57,10 +52,7 @@ public class LocationService extends Service {
         if(handler!= null){
             handler.removeCallbacksAndMessages(null);
         }
-<<<<<<< HEAD
         Log.d("TestService","Run onDestroy");
-=======
->>>>>>> parent of e02d819... signal simple
         Toast.makeText(this, "onDestroy_Service", Toast.LENGTH_SHORT).show();
     }
 
