@@ -1,4 +1,4 @@
-package com.example.luong.location.dataStorage;
+package com.example.luong.location.DataStorage;
 
 import android.content.ContentValues;
 import android.content.Context;
