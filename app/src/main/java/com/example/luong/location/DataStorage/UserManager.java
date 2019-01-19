@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.luong.location.models.User;
+import com.example.luong.location.entities.User;
 
 public class UserManager extends SQLiteOpenHelper{
     private static final String TABLE_NAME ="user";

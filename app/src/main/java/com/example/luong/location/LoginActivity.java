@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.util.Log;
 import android.view.View;
@@ -17,13 +15,18 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+<<<<<<< HEAD
 import com.example.luong.location.common.Libs;
 import com.example.luong.location.dataStorage.ErrorCodes;
+=======
+import com.example.luong.location.common.ErrorCodes;
+import com.example.luong.location.common.GlobalConfig;
+>>>>>>> master
 import com.example.luong.location.common.HttpUtils;
+import com.example.luong.location.common.Libs;
 import com.example.luong.location.dataStorage.UserConnected;
-import com.example.luong.location.dataStorage.UserManager;
-import com.example.luong.location.models.ReturnObj;
-import com.example.luong.location.models.User;
+import com.example.luong.location.entities.ReturnObj;
+import com.example.luong.location.entities.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,6 +34,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Objects;
+
+
 
 
 public class LoginActivity extends Activity {
@@ -44,17 +49,26 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
+        /*innitControl();
         checkIsLogin();//nếu đã đăng nhập thì chuyển màn
-        innitControl();
-        excuteControl();
+        excuteControl();*/
+        //
+        startActivity(new Intent(LoginActivity.this, TestSignalrActivity.class));
+        finish();
+        //
     }
     private void checkIsLogin(){
+        showLoading(true);
         User userSession = UserConnected.getUserSession(LoginActivity.this);
         if(Objects.nonNull(userSession)){
+<<<<<<< HEAD
             //new LoginAsynTask(userSession.getUserName(), userSession.getPassword()).execute();
+=======
+>>>>>>> master
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
+        showLoading(false);
     }
     private void innitControl(){
         btnLogin = findViewById(R.id.btn_login);
@@ -77,8 +91,10 @@ public class LoginActivity extends Activity {
                 String user = Objects.requireNonNull(txtUser.getText()).toString().trim();
                 String pass = Objects.requireNonNull(txtPass.getText()).toString().trim();
                 new LoginAsynTask(user, pass).execute();
+
             }
         });
+
     }
     private void showLoading(Boolean show){
         if(show){
@@ -92,14 +108,15 @@ public class LoginActivity extends Activity {
     private void hideKeyBoard(){
         try {
             InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            assert imm != null;
+            imm.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
         } catch (Exception e) {
             Log.d("LoginActivity/hideKeyBoard",e.getMessage());
         }
     }
 
     @SuppressLint("StaticFieldLeak")
-    public class LoginAsynTask extends AsyncTask<Objects, Void, Object> {
+    protected class LoginAsynTask extends AsyncTask<Objects, Void, Object> {
         private String user;
         private String pass;
 
@@ -124,8 +141,16 @@ public class LoginActivity extends Activity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+<<<<<<< HEAD
             String val = httpUtils.post("Account/LoginMobile", jsonObject.toString());
             ReturnObj<User> rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
+=======
+            String val = httpUtils.post(GlobalConfig.ServerString.BASE_API_URL+"Account/Login", jsonObject.toString());
+            ReturnObj<User> rs = null;
+            if(Libs.isJSONValid(val)){
+                rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
+            }
+>>>>>>> master
             return rs;
         }
 

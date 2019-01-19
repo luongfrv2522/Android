@@ -1,4 +1,4 @@
-package com.example.luong.location.models;
+package com.example.luong.location.entities;
 
 import java.io.Serializable;
 import java.util.List;

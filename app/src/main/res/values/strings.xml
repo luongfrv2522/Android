@@ -16,4 +16,7 @@
     <string name="btn_login">Đăng nhập</string>
     <string name="switch_on">On</string>
     <string name="switch_off">Off</string>
+    <string name="auto_run">Auto Run</string>
+    <string name="log_out">Log Out</string>
+    <string name="run_service">Run Service</string>
 </resources>
