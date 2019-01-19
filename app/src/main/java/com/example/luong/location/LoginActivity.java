@@ -17,6 +17,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.luong.location.common.Libs;
 import com.example.luong.location.dataStorage.ErrorCodes;
 import com.example.luong.location.common.HttpUtils;
 import com.example.luong.location.dataStorage.UserConnected;
@@ -50,7 +51,9 @@ public class LoginActivity extends Activity {
     private void checkIsLogin(){
         User userSession = UserConnected.getUserSession(LoginActivity.this);
         if(Objects.nonNull(userSession)){
-            new LoginAsynTask(userSession.getUserName(), userSession.getPassword()).execute();
+            //new LoginAsynTask(userSession.getUserName(), userSession.getPassword()).execute();
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
         }
     }
     private void innitControl(){
@@ -100,7 +103,7 @@ public class LoginActivity extends Activity {
         private String user;
         private String pass;
 
-        public LoginAsynTask(String user, String pass) {
+        LoginAsynTask(String user, String pass) {
             this.user = user.trim();
             this.pass = pass.trim();
         }
@@ -110,12 +113,18 @@ public class LoginActivity extends Activity {
             HttpUtils httpUtils = new HttpUtils();
             JSONObject jsonObject = new JSONObject();
             try {
+                String androidId = Libs.getAndroidId(LoginActivity.this);
+                String[] info = Libs.getAndroidHardWare();
                 jsonObject.put("UserName", user);
                 jsonObject.put("Password", pass);
+                jsonObject.put("DeviceCode", androidId);
+                jsonObject.put("DeviceName", info[4]+"-"+info[2]+"-"+info[0]);
+                jsonObject.put("DeviceVersion", info[1]);
+                Log.d("jsonObject",jsonObject.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            String val = httpUtils.post("Account/Login", jsonObject.toString());
+            String val = httpUtils.post("Account/LoginMobile", jsonObject.toString());
             ReturnObj<User> rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
             return rs;
         }

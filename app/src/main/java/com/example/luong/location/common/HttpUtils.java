@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class HttpUtils {
-    private final String BASE_URI = "http://100.64.188.115:8088/api/";
+    private final String BASE_URI = "http://193.161.193.99:39874/api/";
     private static OkHttpClient client = null;
     public HttpUtils(){
         if(client == null){
@@ -60,7 +60,7 @@ public class HttpUtils {
     }
     public String post(String uri, String json){
         try {
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8;");
+            MediaType JSON = MediaType.parse("application/json");
             RequestBody requestBody = RequestBody.create(JSON, json);
             Request request = new Request.Builder()
                     .url(BASE_URI+uri)
