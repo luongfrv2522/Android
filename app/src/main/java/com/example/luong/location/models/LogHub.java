@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutionException;
 import microsoft.aspnet.signalr.client.Action;
 import microsoft.aspnet.signalr.client.ConnectionState;
 import microsoft.aspnet.signalr.client.ErrorCallback;
+import microsoft.aspnet.signalr.client.LogLevel;
+import microsoft.aspnet.signalr.client.Logger;
 import microsoft.aspnet.signalr.client.Platform;
 import microsoft.aspnet.signalr.client.SignalRFuture;
 import microsoft.aspnet.signalr.client.StateChangedCallback;
@@ -29,7 +31,14 @@ public class LogHub {
     private boolean started = false;
     public LogHub(){
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
-        hubConnection = new HubConnection(GlobalConfig.ServerString.BASE_HUB_URL);
+        String CONNECTION_QUERYSTRING = "userId=1&deviceId=3";
+
+        hubConnection = new HubConnection(GlobalConfig.ServerString.BASE_HUB_URL, CONNECTION_QUERYSTRING, false, new Logger() {
+            @Override
+            public void log(String message, LogLevel level) {
+                //System.out.println(message);
+            }
+        });
         hubConnection.connected(new Runnable() {
             @Override
             public void run() {
@@ -39,19 +48,39 @@ public class LogHub {
         hubProxy = hubConnection.createHubProxy(GlobalConfig.ServerString.CHAT_HUB_NAME);
         Log.d("signalr","Begin startSignalR()");
         clientTransport = new ServerSentEventsTransport(hubConnection.getLogger());
-        signalRFuture  = hubConnection.start(clientTransport);
+    }
+
+    /**
+     * Contructor với query string và logger
+     * @param CONNECTION_QUERYSTRING "x=A&y=B"
+     * @param logger callback logging
+     */
+    public LogHub(String CONNECTION_QUERYSTRING, Logger logger){
+        Platform.loadPlatformComponent(new AndroidPlatformComponent());
+        hubConnection = new HubConnection(GlobalConfig.ServerString.BASE_HUB_URL, CONNECTION_QUERYSTRING, false, logger);
+        hubConnection.connected(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("signalr","hubConnection connected!");
+            }
+        });
+        hubProxy = hubConnection.createHubProxy(GlobalConfig.ServerString.CHAT_HUB_NAME);
+        Log.d("signalr","Begin startSignalR()");
+        clientTransport = new ServerSentEventsTransport(hubConnection.getLogger());
     }
     public boolean isStarted(){
         return started;
     }
     public boolean startHub(){
         try {
-            signalRFuture.get();
-            Log.d("signalr","state: " + hubConnection.getState());
+            signalRFuture  = hubConnection.start(clientTransport);
+            signalRFuture.get(); 
+            Log.d("signalr","state: " + hubConnection .getState());
             hubConnection.stateChanged(new StateChangedCallback() {
                 @Override
                 public void stateChanged(ConnectionState connectionState, ConnectionState connectionState1) {
                     Log.d("signalr","connectionState: " + connectionState + " - connectionState1: " + connectionState1);
+                    Log.d("signalr","stateChanged - state: " + hubConnection .getState());
                 }
             });
 

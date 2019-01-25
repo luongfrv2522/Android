@@ -11,7 +11,6 @@ import com.example.luong.location.entities.User;
 public class UserManager extends SQLiteOpenHelper{
     private static final String TABLE_NAME ="user";
     private static final String USER_ID ="user_id";
-    private static final String CONNECTION_ID ="connection_id";
     private static final String USER_NAME ="user_name";
     private static final String PASSWORD ="password";
     private static final String FULL_NAME ="full_name";
@@ -31,7 +30,6 @@ public class UserManager extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         String sqlQuery = "CREATE TABLE " + TABLE_NAME +
                 "( "+ USER_ID + " INT, " +
-                CONNECTION_ID + " TEXT, " +
                 USER_NAME     + " TEXT, " +
                 PASSWORD      + " TEXT, " +
                 FULL_NAME     + " TEXT, " +
@@ -54,14 +52,13 @@ public class UserManager extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(USER_ID, user.getUserId());
-        values.put(CONNECTION_ID, user.getConnectionId());
         values.put(USER_NAME, user.getUserName());
         values.put(PASSWORD, user.getPassword());
         values.put(FULL_NAME, user.getFullName());
         values.put(EMAIL, user.getEmail());
         values.put(USER_TYPE, user.getUserType());
         values.put(DESCRIPTION, user.getDescription());
-        values.put(CREATED, user.getCreated());
+        values.put(CREATED, user.getCreated().toString());
         //Neu de null thi khi value bang null thi loi
         db.insert(TABLE_NAME,null,values);
         db.close();
@@ -71,14 +68,13 @@ public class UserManager extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(USER_ID, user.getUserId());
-        values.put(CONNECTION_ID, user.getConnectionId());
         values.put(USER_NAME, user.getUserName());
         values.put(PASSWORD, user.getPassword());
         values.put(FULL_NAME, user.getFullName());
         values.put(EMAIL, user.getEmail());
         values.put(USER_TYPE, user.getUserType());
         values.put(DESCRIPTION, user.getDescription());
-        values.put(CREATED, user.getCreated());
+        values.put(CREATED, user.getCreated().toString());
         //Neu de null thi khi value bang null thi loi
         db.insert(TABLE_NAME,null,values);
         return db.update(TABLE_NAME,values,USER_ID +"=?",new String[] { String.valueOf(user.getUserId())});

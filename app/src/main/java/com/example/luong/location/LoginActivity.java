@@ -15,13 +15,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-<<<<<<< HEAD
-import com.example.luong.location.common.Libs;
-import com.example.luong.location.dataStorage.ErrorCodes;
-=======
+import com.example.luong.location.common.Encrypt;
 import com.example.luong.location.common.ErrorCodes;
 import com.example.luong.location.common.GlobalConfig;
->>>>>>> master
 import com.example.luong.location.common.HttpUtils;
 import com.example.luong.location.common.Libs;
 import com.example.luong.location.dataStorage.UserConnected;
@@ -49,22 +45,18 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
-        /*innitControl();
+        innitControl();
         checkIsLogin();//nếu đã đăng nhập thì chuyển màn
-        excuteControl();*/
+        excuteControl();
         //
-        startActivity(new Intent(LoginActivity.this, TestSignalrActivity.class));
-        finish();
+//        startActivity(new Intent(LoginActivity.this, TestSignalrActivity.class));
+//        finish();
         //
     }
     private void checkIsLogin(){
         showLoading(true);
         User userSession = UserConnected.getUserSession(LoginActivity.this);
         if(Objects.nonNull(userSession)){
-<<<<<<< HEAD
-            //new LoginAsynTask(userSession.getUserName(), userSession.getPassword()).execute();
-=======
->>>>>>> master
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
@@ -91,7 +83,6 @@ public class LoginActivity extends Activity {
                 String user = Objects.requireNonNull(txtUser.getText()).toString().trim();
                 String pass = Objects.requireNonNull(txtPass.getText()).toString().trim();
                 new LoginAsynTask(user, pass).execute();
-
             }
         });
 
@@ -133,7 +124,7 @@ public class LoginActivity extends Activity {
                 String androidId = Libs.getAndroidId(LoginActivity.this);
                 String[] info = Libs.getAndroidHardWare();
                 jsonObject.put("UserName", user);
-                jsonObject.put("Password", pass);
+                jsonObject.put("Password", Encrypt.baseMd5Encode(pass));
                 jsonObject.put("DeviceCode", androidId);
                 jsonObject.put("DeviceName", info[4]+"-"+info[2]+"-"+info[0]);
                 jsonObject.put("DeviceVersion", info[1]);
@@ -141,16 +132,11 @@ public class LoginActivity extends Activity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-<<<<<<< HEAD
-            String val = httpUtils.post("Account/LoginMobile", jsonObject.toString());
-            ReturnObj<User> rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
-=======
-            String val = httpUtils.post(GlobalConfig.ServerString.BASE_API_URL+"Account/Login", jsonObject.toString());
+            String val = httpUtils.post(GlobalConfig.ServerString.BASE_API_URL+"Account/LoginMobile", jsonObject.toString());
             ReturnObj<User> rs = null;
             if(Libs.isJSONValid(val)){
                 rs = new Gson().fromJson(val, new TypeToken<ReturnObj<User>>(){}.getType());
             }
->>>>>>> master
             return rs;
         }
 

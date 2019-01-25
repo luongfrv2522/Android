@@ -23,7 +23,7 @@ public class TestSignalrActivity extends AppCompatActivity {
         logHub.addOn2("addNewMessageToPage", new SubscriptionHandler2<String, String>() {
             @Override
             public void run(String s, String s2) {
-                Log.d("signalr",s + " + " + s2);
+            Log.d("signalr",s + " + " + s2);
             }
         });
         final Handler handler = new Handler();

@@ -13,10 +13,6 @@ import java.io.IOException;
 import java.util.Map;
 
 public class HttpUtils {
-<<<<<<< HEAD
-    private final String BASE_URI = "http://193.161.193.99:39874/api/";
-=======
->>>>>>> master
     private static OkHttpClient client = null;
     public HttpUtils(){
         if(client == null){

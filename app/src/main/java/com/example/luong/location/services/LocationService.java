@@ -23,11 +23,14 @@ import android.widget.Toast;
 
 import com.example.luong.location.common.GlobalConfig;
 import com.example.luong.location.dataStorage.UserConnected;
+import com.example.luong.location.entities.LocationLog;
 import com.example.luong.location.models.LogHub;
 import com.google.gson.JsonObject;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import microsoft.aspnet.signalr.client.Credentials;
@@ -45,6 +48,7 @@ import microsoft.aspnet.signalr.client.transport.ServerSentEventsTransport;
 import static android.support.v4.app.ActivityCompat.requestPermissions;
 
 public class LocationService extends Service{
+    private static List<LocationLog> logList = new ArrayList<>();
     private LogHub logHub;
     private Handler handlerHub;
     private Handler handler;
@@ -74,26 +78,6 @@ public class LocationService extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         handlerHub = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if(logHub.isStarted()){
-                    boolean flagA = logHub.addInvoke("Send", "luongk","signalr: Invoike truc tiep");
-                    Log.d("signalr", "addInvoke: " + flagA);
-                }
-                else{
-                    if(logHub.startHub()){
-                        logHub.addInvoke("Send", "luongk","signalr: Invoike sau khi khoi dong lai Hub");
-                        Log.d("signalr", "signalr: Invoike sau khi khoi dong lai Hub");
-                    }else {
-                        Log.e("signalr", "Khong khoi dong lai duocj");
-                    }
-                }
-                Log.e("signalr", "Runable");
-                handlerHub.postDelayed(this,3000);
-            }
-        };
-        handlerHub.post(runnable);
         Toast.makeText(this, "onStartCommand_Service", Toast.LENGTH_SHORT).show();
         //region listener
         listener = new MyLocationListener();

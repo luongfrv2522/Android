@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //Toast.makeText(this, "onResume_MainMenu", Toast.LENGTH_SHORT).show();
     }
-;
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
