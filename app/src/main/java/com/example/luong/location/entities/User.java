@@ -12,9 +12,9 @@ public class User implements Serializable {
     private String Email;
     private int UserType;
     private String Description;
-    private Date Created;
+    private String Created;
 
-    public User(int userId, int deviceId, String userName, String password, String fullName, String email, int userType, String description, Date created) {
+    public User(int userId, int deviceId, String userName, String password, String fullName, String email, int userType, String description, String created) {
         UserId = userId;
         DeviceId = deviceId;
         UserName = userName.trim();
@@ -60,7 +60,7 @@ public class User implements Serializable {
         return Description;
     }
 
-    public Date getCreated() {
+    public String getCreated() {
         return Created;
     }
 
@@ -96,7 +96,7 @@ public class User implements Serializable {
         Description = description;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(String created) {
         Created = created;
     }
 }

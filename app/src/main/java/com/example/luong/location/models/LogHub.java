@@ -74,7 +74,7 @@ public class LogHub {
     public boolean startHub(){
         try {
             signalRFuture  = hubConnection.start(clientTransport);
-            signalRFuture.get(); 
+            signalRFuture.get();
             Log.d("signalr","state: " + hubConnection .getState());
             hubConnection.stateChanged(new StateChangedCallback() {
                 @Override

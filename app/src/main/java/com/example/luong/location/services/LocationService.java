@@ -1,16 +1,13 @@
 package com.example.luong.location.services;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -21,34 +18,26 @@ import android.util.Log;
 import android.widget.Toast;
 
 
-import com.example.luong.location.common.GlobalConfig;
 import com.example.luong.location.dataStorage.UserConnected;
-import com.example.luong.location.entities.LocationLog;
+import com.example.luong.location.entities.Message;
+import com.example.luong.location.entities.User;
 import com.example.luong.location.models.LogHub;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import java.net.ConnectException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import microsoft.aspnet.signalr.client.Credentials;
-import microsoft.aspnet.signalr.client.Platform;
-import microsoft.aspnet.signalr.client.SignalRFuture;
-import microsoft.aspnet.signalr.client.http.Request;
-import microsoft.aspnet.signalr.client.http.android.AndroidPlatformComponent;
-import microsoft.aspnet.signalr.client.hubs.HubConnection;
-import microsoft.aspnet.signalr.client.hubs.HubProxy;
-import microsoft.aspnet.signalr.client.hubs.SubscriptionHandler;
+import microsoft.aspnet.signalr.client.LogLevel;
+import microsoft.aspnet.signalr.client.Logger;
 import microsoft.aspnet.signalr.client.hubs.SubscriptionHandler2;
-import microsoft.aspnet.signalr.client.transport.ClientTransport;
-import microsoft.aspnet.signalr.client.transport.ServerSentEventsTransport;
-
-import static android.support.v4.app.ActivityCompat.requestPermissions;
 
 public class LocationService extends Service{
-    private static List<LocationLog> logList = new ArrayList<>();
+    private static List<Message> logList = new ArrayList<>();
+    private User userSession;
+
     private LogHub logHub;
     private Handler handlerHub;
     private Handler handler;
@@ -65,7 +54,15 @@ public class LocationService extends Service{
         Toast.makeText(this, "onCreate_Service", Toast.LENGTH_SHORT).show();
         Log.d("signalr", "In startSignalR()");
         //startSignalR();
-        logHub = new LogHub();
+        userSession = UserConnected.getUserSession(this);
+        String ConnectionQeryString = "userId="+userSession.getUserId()
+                    +"&deviceId="+userSession.getDeviceId();
+        logHub = new LogHub(ConnectionQeryString, new Logger() {
+            @Override
+            public void log(String s, LogLevel logLevel) {
+
+            }
+        });
         logHub.startHub();
         logHub.addOn2("addNewMessageToPage", new SubscriptionHandler2<String, String>() {
             @Override
@@ -113,16 +110,29 @@ public class LocationService extends Service{
         @Override
         public void onLocationChanged(Location location) {
             //
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("Lat", location.getLatitude());
-            jsonObject.addProperty("Lng", location.getLongitude());
+            int persent = 100000000;
             //
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("lat", location.getLatitude());
+            jsonObject.addProperty("lng", location.getLongitude());
+            jsonObject.addProperty("created", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(new Date()));
+            Message message = new Message();
+            message.lat = (double) Math.round(location.getLatitude() * persent) / persent;
+            message.lng = (double) Math.round(location.getLongitude() * persent) / persent;
+            message.created = new Date();
+            //
+            logList.add(message);
             Intent i = new Intent("location_update");
             i.putExtra("coordinates", jsonObject.toString());
             sendBroadcast(i);
             //
-            Log.d("signalr", UserConnected.getUserSession(LocationService.this).getUserId() + ":" + jsonObject.toString());
-            //hubProxy.invoke("Send", UserConnected.getUserSession(LocationService.this).getUserId(), jsonObject.toString());
+            if(logList.size() >= 5){
+                logHub.addInvoke("LogLocation", userSession.getUserId(), userSession.getDeviceId(), logList);
+                logList.clear();
+
+            }
+            Log.d("signalr", userSession.getUserId() + ":" + jsonObject.toString());
+            //logHub.addInvoke("Send", userSession.getUserId(), userSession.getDeviceId() + ":" + new Gson().toJson(logList));
 
         }
 

@@ -56,7 +56,7 @@ public class LoginActivity extends Activity {
     private void checkIsLogin(){
         showLoading(true);
         User userSession = UserConnected.getUserSession(LoginActivity.this);
-        if(Objects.nonNull(userSession)){
+        if(userSession != null){
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
@@ -80,8 +80,8 @@ public class LoginActivity extends Activity {
                 //show loading
                 showLoading(true);
                 //Login Asyntask
-                String user = Objects.requireNonNull(txtUser.getText()).toString().trim();
-                String pass = Objects.requireNonNull(txtPass.getText()).toString().trim();
+                String user = txtUser.getText().toString().trim();
+                String pass = txtPass.getText().toString().trim();
                 new LoginAsynTask(user, pass).execute();
             }
         });
@@ -100,9 +100,9 @@ public class LoginActivity extends Activity {
         try {
             InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
             assert imm != null;
-            imm.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         } catch (Exception e) {
-            Log.d("LoginActivity/hideKeyBoard",e.getMessage());
+            Log.d("Login/hideKeyBoard",e.getMessage());
         }
     }
 
@@ -142,7 +142,7 @@ public class LoginActivity extends Activity {
 
         @Override
         protected void onPostExecute(Object o) {
-            if (Objects.nonNull(o)) {
+            if (o != null) {
                 ReturnObj<User> u = (ReturnObj<User>) o;
                 //
                 if (u.ErrorCode.equals(ErrorCodes.SUCCESS) && u.hasData()) {
@@ -150,7 +150,7 @@ public class LoginActivity extends Activity {
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
                 } else {
-                    Log.e("LoginActivity/onPostExecute", u.ErrorCode + " - " + u.ErrorMessage);
+                    Log.e("Login/onPostExecute", u.ErrorCode + " - " + u.ErrorMessage);
                     Toast.makeText(LoginActivity.this, u.ErrorMessage, Toast.LENGTH_LONG).show();
                 }
             } else {
