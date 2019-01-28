@@ -8,6 +8,8 @@ import android.widget.Button;
 
 import com.example.luong.location.models.LogHub;
 
+import java.util.concurrent.ExecutionException;
+
 import microsoft.aspnet.signalr.client.hubs.SubscriptionHandler2;
 
 public class TestSignalrActivity extends AppCompatActivity {
@@ -19,7 +21,11 @@ public class TestSignalrActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test_signalr);
         button = findViewById(R.id.button);
         logHub = new LogHub();
-        logHub.startHub();
+        try {
+            logHub.startHub();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
         logHub.addOn2("addNewMessageToPage", new SubscriptionHandler2<String, String>() {
             @Override
             public void run(String s, String s2) {

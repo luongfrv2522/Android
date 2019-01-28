@@ -86,22 +86,15 @@ public class MainActivity extends AppCompatActivity {
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    txtStateService.setText(intent.getExtras().get("coordinates").toString());
-                }
-            };
-            registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
-        }
-        if(broadcastReceiver2 == null){
-            broadcastReceiver2 = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    boolean status = Objects.requireNonNull(intent.getExtras()).getBoolean("status");
+                    txtStateService.setText(intent.getExtras().getString("coordinates",""));
+                    //Nếu là update status thì update
+                    boolean status = intent.getExtras().getBoolean("status", false);
                     if(status){
                         swtService.setChecked(false);
                     }
                 }
             };
-            registerReceiver(broadcastReceiver, new IntentFilter("off_switch"));
+            registerReceiver(broadcastReceiver, new IntentFilter("location_update"));
         }
         //Toast.makeText(this, "onResume_MainMenu", Toast.LENGTH_SHORT).show();
     }
@@ -168,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     @SuppressLint("StaticFieldLeak")
-    private void startServices(){
+    public void startServices(){
 
         new AsyncTask() {
             @Override
@@ -185,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         }.execute();
 
     }
-    private void stopServices(){
+    public void stopServices(){
         if(intentService!=null) stopService(intentService);
         updateShowState();
     }

@@ -91,9 +91,11 @@ public class LoginActivity extends Activity {
         if(show){
             layoutScroll.setVisibility(View.GONE);
             prsLogin.setVisibility(View.VISIBLE);
+            btnLogin.setEnabled(false);
         }else {
             layoutScroll.setVisibility(View.VISIBLE);
             prsLogin.setVisibility(View.GONE);
+            btnLogin.setEnabled(true);
         }
     }
     private void hideKeyBoard(){
@@ -154,7 +156,7 @@ public class LoginActivity extends Activity {
                     Toast.makeText(LoginActivity.this, u.ErrorMessage, Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(LoginActivity.this, "Lỗi Api", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, "Lỗi mạng", Toast.LENGTH_LONG).show();
             }
             showLoading(false);
         }
