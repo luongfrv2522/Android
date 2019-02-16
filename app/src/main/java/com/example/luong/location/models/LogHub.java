@@ -29,7 +29,7 @@ public class LogHub {
         @Override
         public void run() {
             if(!handlerDisconnect && getCurentState() == ConnectionState.Disconnected){
-                Log.d("signalr", "closed Step 2");
+                Log.d("signalr", "handlerDisconnect :" + handlerDisconnect +" closed Step 2");
                 try {
                     startHub();
                 } catch (ExecutionException | InterruptedException e) {
@@ -118,7 +118,8 @@ public class LogHub {
         hubProxy.on(name, subscriptionHandler2, String.class,String.class);
     }
     public boolean addInvoke(String name, Object... params){
-
+        Log.d("signalr","addInvoke: step 1" );
+        boolean sendStatus = true;
         try {
             SignalRFuture<Void> rs = null;
             if(hubConnection.getState() == ConnectionState.Connected){
@@ -126,12 +127,14 @@ public class LogHub {
             }
             if (rs != null) {
                 rs.get();
+            }else{
+                sendStatus = false;
             }
+            Log.d("signalr","rs: "+(rs!=null)+" addInvoke: step 2" );
         } catch (InterruptedException | ExecutionException e) {
-            Log.d("signalr","addInvoke: Không invoke được" );
-            return false;
+            sendStatus = false;
         }
-        return true;
+        return sendStatus;
     }
 
     public void disconnectHub(){

@@ -1,6 +1,7 @@
 package com.example.luong.location.services;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 
+import com.example.luong.location.common.StaticClass;
 import com.example.luong.location.dataStorage.UserConnected;
 import com.example.luong.location.entities.Message;
 import com.example.luong.location.entities.User;
@@ -122,8 +124,8 @@ public class LocationService extends Service{
         }
         if(locationManager != null){
             Log.d("signalr", "locationManager Not null");
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, listener);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, listener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, listener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, listener);
         }
         //endregion
         return START_STICKY;
@@ -139,33 +141,27 @@ public class LocationService extends Service{
     }
     public class MyLocationListener implements LocationListener{
 
+        @SuppressLint("SimpleDateFormat")
         @Override
         public void onLocationChanged(Location location) {
 
-            //
-            int persent = 100000000;
-            //
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("lat", location.getLatitude());
-            jsonObject.addProperty("lng", location.getLongitude());
-            jsonObject.addProperty("created", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(new Date()));
             Message message = new Message();
-            message.lat = (double) Math.round(location.getLatitude() * persent) / persent;
-            message.lng = (double) Math.round(location.getLongitude() * persent) / persent;
-            message.created = new Date();
+            message.lat = location.getLatitude();
+            message.lng = location.getLongitude();
+            message.created = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(new Date());
             //
             logList.add(message);
             Intent i = new Intent("location_update");
-            i.putExtra("coordinates", jsonObject.toString());
+            i.putExtra("coordinates", StaticClass.SingletonGson.getInstance().toJson(message));
             sendBroadcast(i);
             //
             if(logList.size() >= 5){
-                logHub.addInvoke("LogLocation", userSession.getUserId(), userSession.getDeviceId(), logList);
-                logList.clear();
-
+                boolean flag;
+                flag = logHub.addInvoke("LogLocation", userSession.getUserId(), userSession.getDeviceId(), logList);
+                if(flag) logList.clear();
             }
             //Log.d("signalr", userSession.getUserId() + ":" + jsonObject.toString());
-            logHub.addInvoke("Send", userSession.getUserId(), userSession.getDeviceId() + ":" + new Gson().toJson(logList));
+            //logHub.addInvoke("Send", userSession.getUserId(), userSession.getDeviceId() + ":" + new Gson().toJson(logList));
 
         }
 
