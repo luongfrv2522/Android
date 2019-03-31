@@ -38,7 +38,6 @@ public class LoginActivity extends Activity {
     Button btnLogin;
     LinearLayout prsLogin;
     ScrollView layoutScroll;
-    TextView txtRs;
     TextInputEditText txtUser,txtPass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +65,6 @@ public class LoginActivity extends Activity {
         btnLogin = findViewById(R.id.btn_login);
         prsLogin = findViewById(R.id.login_progress);
         layoutScroll = findViewById(R.id.layout_scroll);
-        txtRs = findViewById(R.id.txtRs);
         txtUser = findViewById(R.id.txtUser);
         txtPass = findViewById(R.id.txtPass);
     }

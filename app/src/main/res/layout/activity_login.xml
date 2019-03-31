@@ -85,12 +85,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"/>
-            <TextView
-                android:id="@+id/txtRs"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:text="none"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
         </LinearLayout>
     </ScrollView>
 

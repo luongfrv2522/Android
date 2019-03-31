@@ -151,8 +151,11 @@ public class LocationService extends Service{
             message.created = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(new Date());
             //
             logList.add(message);
+            if(logList.size() > 8600){
+                logList.remove(logList.size() - 1);
+            }
             Intent i = new Intent("location_update");
-            i.putExtra("coordinates", StaticClass.SingletonGson.getInstance().toJson(message));
+            i.putExtra("coordinates", "Lat: "+message.lat + "\n Lng: "+message.lng);
             sendBroadcast(i);
             //
             if(logList.size() >= 5){
